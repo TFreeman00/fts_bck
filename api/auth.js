@@ -1,0 +1,98 @@
+const router = require("express").Router();
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
+// register a new user ||Test Approved
+//POST ||Path //http://localhost:3000/auth/register
+
+router.post("/register", async (req, res, next) => {
+  try {
+    const { firstname, lastname, email, password } = req.body;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    if (!firstname || !lastname) {
+      return res.status(401).send("Please enter your name.");
+    }
+
+    const isValidEmail = (email) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    };
+
+    if (!isValidEmail(email)) {
+      return res.status(401).send("Invalid email address.");
+    }
+
+    if (password.length < 7) {
+      return res.status(401).send("password must be at least 7 characters.");
+    }
+
+    const user = await prisma.users.create({
+      data: {
+        firstname,
+        lastname,
+        email,
+        password: hashedPassword,
+      },
+    });
+    const token = jwt.sign({ id: user.id }, process.env.JWT, {
+      expiresIn: "1h",
+    });
+
+    res.send({ user, token });
+  } catch (error) {
+    next(error);
+  }
+});
+
+//login to an existing account ||Test Approved
+//Post || PATH || http://localhost:3000/auth/login
+
+router.post("/login", async (req, res, next) => {
+  try {
+    if (!req.body.email)
+      return res.status(401).send("Invalid login credentials");
+    const user = await prisma.users.findFirst({
+      where: {
+        email: req.body.email,
+      },
+    });
+
+    if (user.email !== req.body.email)
+      return res.status(401).send("Invalid login credentials");
+    const match = await bcrypt.compare(req.body.password, user?.password);
+
+    if (!match) {
+      return res.status(401).send("Invalid login credentials.");
+    }
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT, {
+      expiresIn: "1h",
+    });
+    res.send({ token, user });
+  } catch (error) {
+    next(error);
+  }
+});
+
+//Get the currently logged in user ||Test Approved
+//GET || PATH || http://localhost:3000/auth/me
+
+router.get("/me", async (req, res, next) => {
+  try {
+    const user = await prisma.users.findFirst({
+      where: {
+        id: req.user.id,
+      },
+    });
+
+    res.send(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
+module.exports = router;
