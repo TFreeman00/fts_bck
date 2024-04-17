@@ -24,6 +24,7 @@ app.use((req, res, next) => {
 
 app.use("/auth", require("./api/auth.js"));
 app.use("/users", require("./api/users.js"));
+app.use("/posts", require("./api/posts.js"));
 
 app.listen(3306, function () {
   console.log("listening on port 3306!");

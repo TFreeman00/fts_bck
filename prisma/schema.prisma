@@ -1,0 +1,45 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique
+  email       String   @unique
+  password    String
+  posts       Post[]   @relation("UserToPost")
+  likedPosts  Like[]   @relation("LikedPosts")
+  dislikedPosts Dislike[] @relation("DislikedPosts")
+}
+
+model Post {
+  id            Int        @id @default(autoincrement())
+  content       String
+  author        User       @relation("UserToPost", fields: [authorId], references: [id])
+  authorId      Int
+  createdAt     DateTime   @default(now())
+  likes         Like[]     @relation("PostLikes")
+  dislikes      Dislike[]  @relation("PostDislikes")
+}
+
+model Like {
+  id          Int      @id @default(autoincrement())
+  post        Post     @relation("PostLikes", fields: [postId], references: [id])
+  postId      Int
+  user        User     @relation("LikedPosts", fields: [userId], references: [id])
+  userId      Int
+}
+
+model Dislike {
+  id          Int      @id @default(autoincrement())
+  post        Post     @relation("PostDislikes", fields: [postId], references: [id])
+  postId      Int
+  user        User     @relation("DislikedPosts", fields: [userId], references: [id])
+  userId      Int
+}
