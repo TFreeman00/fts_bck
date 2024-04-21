@@ -5,11 +5,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 // register a new user ||Test Approved
-//POST ||Path //http://localhost:3000/auth/register
+//POST ||Path //http://localhost:3307/auth/register
 
 router.post("/register", async (req, res, next) => {
   try {
-    const { firstname, lastname, email, password } = req.body;
+    const { firstname, lastname, email, username, password } = req.body;
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -30,10 +30,11 @@ router.post("/register", async (req, res, next) => {
       return res.status(401).send("password must be at least 7 characters.");
     }
 
-    const user = await prisma.users.create({
+    const user = await prisma.user.create({
       data: {
         firstname,
         lastname,
+        username,
         email,
         password: hashedPassword,
       },
@@ -49,13 +50,13 @@ router.post("/register", async (req, res, next) => {
 });
 
 //login to an existing account ||Test Approved
-//Post || PATH || http://localhost:3000/auth/login
+//Post || PATH || http://localhost:3307/auth/login
 
 router.post("/login", async (req, res, next) => {
   try {
     if (!req.body.email)
       return res.status(401).send("Invalid login credentials");
-    const user = await prisma.users.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
         email: req.body.email,
       },
@@ -79,11 +80,11 @@ router.post("/login", async (req, res, next) => {
 });
 
 //Get the currently logged in user ||Test Approved
-//GET || PATH || http://localhost:3000/auth/me
+//GET || PATH || http://localhost:3307/auth/me
 
 router.get("/me", async (req, res, next) => {
   try {
-    const user = await prisma.users.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
         id: req.user.id,
       },
