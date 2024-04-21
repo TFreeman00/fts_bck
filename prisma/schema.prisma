@@ -11,8 +11,11 @@ datasource db {
 model User {
   id          Int      @id @default(autoincrement())
   username    String   @unique
-  email       String   @unique
-  password    String
+  firstname    String  @db.VarChar(20) 
+  lastname    String  @db.VarChar(20)
+  email     String   @unique @db.VarChar(255)
+  password    String @db.VarChar(255)
+  isadmin   Boolean? @default(false)
   posts       Post[]   @relation("UserToPost")
   likedPosts  Like[]   @relation("LikedPosts")
   dislikedPosts Dislike[] @relation("DislikedPosts")
@@ -26,6 +29,13 @@ model Post {
   createdAt     DateTime   @default(now())
   likes         Like[]     @relation("PostLikes")
   dislikes      Dislike[]  @relation("PostDislikes")
+  categories    Category[] @relation("CategoryToPost")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  posts       Post[]   @relation("CategoryToPost")
 }
 
 model Like {

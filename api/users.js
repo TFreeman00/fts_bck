@@ -13,10 +13,10 @@ router.use((req, res, next) => {
 });
 
 // Get all users  ||Test Approved
-//GET || PATH || http://localhost:33060/users 
+//GET || PATH || http://localhost:3307/users 
 router.get("/", async (req, res, next) => {
   try {
-    const users = await prisma.users.findMany();
+    const users = await prisma.user.findMany();
     res.send(users);
   } catch (error) {
     next(error);
@@ -24,10 +24,10 @@ router.get("/", async (req, res, next) => {
 });
 
 //Get user by id ||Test Approved
-// GET || PATH// http://localhost:3306/users/1
+// GET || PATH// http://localhost:3307/users/id
 router.get("/:id", async (req, res, next) => {
   try {
-    const user = await prisma.users.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
         id: Number(req.params.id),
       },
@@ -39,12 +39,13 @@ router.get("/:id", async (req, res, next) => {
 });
 
 // create new user ||Test Approved
-// POST || PATH// http://localhost:3306/users
+// POST || PATH// http://localhost:3307/users
 router.post("/", async (req, res, next) => {
   try {
-    const { firstname, lastname, email, password } = req.body;
-    const user = await prisma.users.create({
+    const { username, firstname, lastname, email, password } = req.body;
+    const user = await prisma.user.create({
       data: {
+        username,
         firstname,
         lastname,
         email,
@@ -58,19 +59,21 @@ router.post("/", async (req, res, next) => {
 });
 
 // Update user ||Test Approved
-// PUT || PATH// http://localhost:3306/users/6 (Choose userId num to update)
+// PUT || PATH// http://localhost:3307/users/id (Choose userId num to update)
 router.put("/:id", async (req, res, next) => {
   try {
-    const { firstname, lastname, password } = req.body;
+    const { username, firstname, lastname, email, password } = req.body;
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const user = await prisma.users.update({
+    const user = await prisma.user.update({
       where: {
         id: Number(req.params.id),
       },
       data: {
+        username,
         firstname,
         lastname,
+        email,
         password: hashedPassword,
       },
     });
@@ -81,10 +84,10 @@ router.put("/:id", async (req, res, next) => {
 });
 
 // Delete user ||Test Approved
-//DELETE || PATH || http://localhost:3306/users/8 (choose userID num to delete)
+//DELETE || PATH || http://localhost:3307/users/id (choose userID num to delete)
 router.delete("/:id", async (req, res, next) => {
   try {
-    const user = await prisma.users.delete({
+    const user = await prisma.user.delete({
       where: {
         id: Number(req.params.id),
       },

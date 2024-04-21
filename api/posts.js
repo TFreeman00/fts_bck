@@ -11,8 +11,33 @@ router.use((req, res, next) => {
   next();
 });
 
+// Get all posts
+router.get("/", async (req, res, next) => {
+  try {
+    const posts = await prisma.post.findMany();
+    res.status(200).send(posts);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get posts by category
+router.get("/category/:category", async (req, res, next) => {
+  try {
+    const category = req.params.category;
+    const posts = await prisma.post.findMany({
+      where: {
+        category: category
+      }
+    });
+    res.status(200).send(posts);
+  } catch (error) {
+    next(error);
+  }
+});
+
 //Creating a Post connected to the logged in User's ID
-router.post("/posts", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     const { content } = req.body;
     const userId = req.user.id;
@@ -32,8 +57,8 @@ router.post("/posts", async (req, res, next) => {
 });
 
 // Create a new post (for non logged in user)
-// POST || PATH// http://localhost:3306/posts
-router.post("/posts", async (req, res, next) => {
+// POST || PATH// http://localhost:3307/posts
+router.post("/", async (req, res, next) => {
   try {
     const { content, author } = req.body;
     const post = await prisma.post.create({
@@ -50,8 +75,8 @@ router.post("/posts", async (req, res, next) => {
 });
 
 // Deleting a post
-// DELETE || PATH// http://localhost:3306/posts/:postId
-router.delete("/posts/:postId", async (req, res, next) => {
+// DELETE || PATH// http://localhost:3307/posts/:postId
+router.delete("/:postId", async (req, res, next) => {
   try {
     const postId = parseInt(req.params.postId);
     const post = await prisma.post.findUnique({
