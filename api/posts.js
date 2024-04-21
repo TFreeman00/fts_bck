@@ -22,13 +22,13 @@ router.get("/", async (req, res, next) => {
 });
 
 // Get posts by category
-router.get("/category/:category", async (req, res, next) => {
+router.get("/:category", async (req, res, next) => {
   try {
     const category = req.params.category;
     const posts = await prisma.post.findMany({
       where: {
-        category: category
-      }
+        category: category,
+      },
     });
     res.status(200).send(posts);
   } catch (error) {
