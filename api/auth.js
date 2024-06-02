@@ -4,9 +4,7 @@ const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// register a new user ||Test Approved
-//POST ||Path //http://localhost:3307/auth/register
-
+// register a new user 
 router.post("/register", async (req, res, next) => {
   try {
     const { firstname, lastname, email, username, password } = req.body;
@@ -49,9 +47,7 @@ router.post("/register", async (req, res, next) => {
   }
 });
 
-//login to an existing account ||Test Approved
-//Post || PATH || http://localhost:3307/auth/login
-
+//login to an existing account 
 router.post("/login", async (req, res, next) => {
   try {
     if (!req.body.email)
@@ -79,9 +75,7 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-//Get the currently logged in user ||Test Approved
-//GET || PATH || http://localhost:3307/auth/me
-
+//Get the currently logged in user
 router.get("/me", async (req, res, next) => {
   try {
     const user = await prisma.user.findFirst({

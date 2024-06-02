@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
@@ -12,10 +12,10 @@ model User {
   id          Int      @id @default(autoincrement())
   username    String   @unique
   firstname    String  @db.VarChar(20) 
-  lastname    String  @db.VarChar(20)
-  email     String   @unique @db.VarChar(255)
-  password    String @db.VarChar(255)
-  isadmin   Boolean? @default(false)
+  lastname    String   @db.VarChar(20)
+  email     String     @unique @db.VarChar(255)
+  password    String   @db.VarChar(255)
+  isadmin   Boolean?   @default(false)
   posts       Post[]   @relation("UserToPost")
   likedPosts  Like[]   @relation("LikedPosts")
   dislikedPosts Dislike[] @relation("DislikedPosts")
@@ -29,6 +29,7 @@ model Post {
   createdAt     DateTime   @default(now())
   likes         Like[]     @relation("PostLikes")
   dislikes      Dislike[]  @relation("PostDislikes")
+  votes     Int      @default(0)
   categories    Category[] @relation("CategoryToPost")
 }
 

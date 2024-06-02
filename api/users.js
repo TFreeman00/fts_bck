@@ -12,8 +12,7 @@ router.use((req, res, next) => {
   next();
 });
 
-// Get all users  ||Test Approved
-//GET || PATH || http://localhost:3307/users 
+// Get all users  
 router.get("/", async (req, res, next) => {
   try {
     const users = await prisma.user.findMany();
@@ -23,8 +22,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-//Get user by id ||Test Approved
-// GET || PATH// http://localhost:3307/users/id
+//Get user by id 
 router.get("/:id", async (req, res, next) => {
   try {
     const user = await prisma.user.findFirst({
@@ -38,8 +36,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// create new user ||Test Approved
-// POST || PATH// http://localhost:3307/users
+// create new user
 router.post("/", async (req, res, next) => {
   try {
     const { username, firstname, lastname, email, password } = req.body;
@@ -58,8 +55,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// Update user ||Test Approved
-// PUT || PATH// http://localhost:3307/users/id (Choose userId num to update)
+// Update user
 router.put("/:id", async (req, res, next) => {
   try {
     const { username, firstname, lastname, email, password } = req.body;
@@ -83,8 +79,7 @@ router.put("/:id", async (req, res, next) => {
   }
 });
 
-// Delete user ||Test Approved
-//DELETE || PATH || http://localhost:3307/users/id (choose userID num to delete)
+// Delete user
 router.delete("/:id", async (req, res, next) => {
   try {
     const user = await prisma.user.delete({
