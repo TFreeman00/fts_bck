@@ -1,6 +1,7 @@
+const express = require("express");
+const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const router = require("express").Router();
 const bcrypt = require("bcrypt");
 
 // Deny access if user is not logged in
@@ -284,7 +285,7 @@ router.put("/:userId/profile", async (req, res, next) => {
 // Search functionality
 router.get("/search", async (req, res, next) => {
   try {
-    const query = req.query.q || ""; 
+    const query = req.query.q || "";
 
     const posts = await prisma.post.findMany({
       where: {
@@ -292,7 +293,7 @@ router.get("/search", async (req, res, next) => {
           {
             content: {
               contains: query,
-              mode: "insensitive", 
+              mode: "insensitive",
             },
           },
           {
@@ -312,3 +313,5 @@ router.get("/search", async (req, res, next) => {
     next(error);
   }
 });
+
+module.exports = router;

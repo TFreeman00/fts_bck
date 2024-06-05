@@ -1,10 +1,11 @@
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// register a new user 
+// register a new user
 router.post("/register", async (req, res, next) => {
   try {
     const { firstname, lastname, email, username, password } = req.body;
@@ -47,7 +48,7 @@ router.post("/register", async (req, res, next) => {
   }
 });
 
-//login to an existing account 
+//login to an existing account
 router.post("/login", async (req, res, next) => {
   try {
     if (!req.body.email)

@@ -1,7 +1,8 @@
 const { PrismaClient } = require("@prisma/client");
 // const { product } = require("../db");
 const prisma = new PrismaClient();
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
 const bcrypt = require("bcrypt");
 
 // Deny access if user is not logged in
