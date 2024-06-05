@@ -9,3 +9,9 @@ Most of this was copied from our last project just to get us set up i have remov
 The port mysql runs on by default is 3307
 
 set up for mysql
+
+
+
+Additional Sequrity - Add a mature section and make sure users are logged in to view and post.
+
+Added feature - view posts by categories

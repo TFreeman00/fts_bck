@@ -26,8 +26,8 @@ app.use("/auth", require("./api/auth.js"));
 app.use("/users", require("./api/users.js"));
 app.use("/posts", require("./api/posts.js"));
 
-app.listen(3307, function () {
-  console.log("listening on port 3307!");
+app.listen(3000, () => {
+  console.log("listening on port 3000!");
 });
 
 module.exports = app;
