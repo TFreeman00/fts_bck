@@ -1,0 +1,58 @@
+const express = require('express');
+const router = express.Router();
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
+router.post('/', require('../auth/middleware'), async (req, res, next) => {
+    try {
+    //Finding a users like and if does not exist you can create one. If exsist you can delete. 
+        const exist = await prisma.like.findFirst({
+            where: {
+                userId: Number(req.user.id),
+                postId: Number(req.body.postId),
+            }
+        })
+
+        if (exist) {
+            await prisma.like.delete({
+                where: {
+                    id: exist.id,
+                    userId: Number(req.user.id),
+                    postId: Number(req.body.postId),
+                }
+            });
+            if (exist.type !== req.body.type) {
+                await prisma.like.create({
+                    data: {
+                        userId: Number(req.user.id),
+                        postId: Number(req.body.postId),
+                        type: req.body.type
+                    }
+                });
+            }
+        } else {
+            await prisma.like.create({
+                data: {
+                    userId: Number(req.user.id),
+                    postId: Number(req.body.postId),
+                    type: req.body.type
+                }
+            });
+        }
+
+        const finalPost = await prisma.post.findFirst({
+            where: {
+                id: req.body.postId
+            },
+            include: {
+                author: true,
+                like: true,
+            }
+        });
+        res.send(finalPost);
+    } catch (err) {
+        next(err);
+    }
+});
+
+module.exports = router;
