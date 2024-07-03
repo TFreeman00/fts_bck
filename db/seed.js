@@ -84,9 +84,7 @@ async function createInitialUsers() {
       confirmPassword: "123",
       isAdmin: true,
     });
-    const salt = await bcrypt.genSalt(10);
-    password = await bcrypt.hash("123", salt);
-    console.log("Finished creating users!");
+    console.log("Users created successful!");
   } catch (error) {
     console.error("Error creating users!");
     throw error;
@@ -107,14 +105,16 @@ async function createUser({
     throw new Error("Passwords do not match");
   }
   try {
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password, salt);
     await prisma.user.create({
       data: {
         firstname: firstName,
         lastname: lastName,
         username,
         email,
-        password,
-        confirmPassword,
+        password: hashPassword,
+        confirmPassword: hashPassword,
         isadmin: isAdmin,
       },
     });

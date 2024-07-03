@@ -54,6 +54,7 @@ router.post("/register", async (req, res, next) => {
         username,
         email,
         password: hashedPassword,
+        confirmPassword: hashedPassword,
       },
     });
     const token = jwt.sign({ id: user.id }, process.env.JWT, {
@@ -70,7 +71,7 @@ router.post("/register", async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
   const { username, password } = req.body;
   // Handle unauthorized user error
-  if (!username) return res.status(401).send("Invalid login credentials");
+  if (!username) return res.status(401).send("Username doesn't exist");
 
   try {
     const user = await prisma.user.findFirst({
