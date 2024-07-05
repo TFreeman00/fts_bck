@@ -10,11 +10,12 @@ datasource db {
 
 model User {
   id          Int      @id @default(autoincrement())
-  username    String   @unique
   firstname    String  @db.VarChar(20) 
   lastname    String   @db.VarChar(20)
+  username    String   @unique
   email     String     @unique @db.VarChar(255)
   password    String   @db.VarChar(255)
+  confirmPassword    String   @db.VarChar(255)
   isadmin   Boolean?   @default(false)
   posts       Post[]   @relation("UserToPost")
   likedPosts  Like[]   @relation("LikedPosts")

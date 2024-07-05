@@ -7,27 +7,45 @@ const prisma = new PrismaClient();
 
 // register a new user
 router.post("/register", async (req, res, next) => {
+  const { firstname, lastname, username, email, password, confirmPassword } =
+    req.body;
+
   try {
-    const { firstname, lastname, email, username, password } = req.body;
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    if (!firstname || !lastname) {
-      return res.status(401).send("Please enter your name.");
-    }
-
     const isValidEmail = (email) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
     };
 
     if (!isValidEmail(email)) {
-      return res.status(401).send("Invalid email address.");
+      // Handle invalid email error
+      return res.status(401).json({ error: "Invalid email address" });
     }
 
-    if (password.length < 7) {
-      return res.status(401).send("password must be at least 7 characters.");
+    if (username.length < 5) {
+      // Handle password format error
+      return res
+        .status(401)
+        .json({ error: "username must be at least 5 characters" });
     }
+
+    if (password.length < 8) {
+      // Handle password format error
+      return res
+        .status(401)
+        .json({ error: "password must be at least 8 characters" });
+    }
+
+    if (password !== confirmPassword) {
+      // Handle password mismatch error
+      return res.status(400).json({ error: "Passwords do not match" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // if (!firstname || !lastname) {
+    //   return res.status(401).send("Please enter your name.");
+    // }
 
     const user = await prisma.user.create({
       data: {
@@ -36,6 +54,7 @@ router.post("/register", async (req, res, next) => {
         username,
         email,
         password: hashedPassword,
+        confirmPassword: hashedPassword,
       },
     });
     const token = jwt.sign({ id: user.id }, process.env.JWT, {
@@ -50,21 +69,28 @@ router.post("/register", async (req, res, next) => {
 
 //login to an existing account
 router.post("/login", async (req, res, next) => {
+  const { username, password } = req.body;
+  // Handle unauthorized user error
+  if (!username) return res.status(401).send("Username doesn't exist");
+
   try {
-    if (!req.body.email)
-      return res.status(401).send("Invalid login credentials");
     const user = await prisma.user.findFirst({
       where: {
-        email: req.body.email,
+        username,
       },
     });
 
-    if (user.email !== req.body.email)
+    if (user.username !== username)
       return res.status(401).send("Invalid login credentials");
-    const match = await bcrypt.compare(req.body.password, user?.password);
 
-    if (!match) {
-      return res.status(401).send("Invalid login credentials.");
+    const match = await bcrypt.compare(password, user?.password);
+
+    if (match) {
+      // Passwords match, authenticate user
+      res.status(200).json({ message: "Login successful" });
+    } else {
+      // Passwords don't match, deny access
+      res.status(401).json({ error: "Unauthorized" });
     }
 
     const token = jwt.sign({ id: user.id }, process.env.JWT, {

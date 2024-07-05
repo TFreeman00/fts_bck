@@ -45,59 +45,76 @@ async function createCategory(name) {
   }
 }
 
-
 async function createInitialUsers() {
   try {
     console.log("Starting to create users...");
-    const salt = await bcrypt.genSalt(10);
     await createUser({
-      username: "Fzee",
       firstName: "Fiona",
       lastName: "Zheng",
+      username: "Fzeee",
       email: "fiona@admin.com",
-      password: await bcrypt.hash("123", salt),
+      password: "123",
+      confirmPassword: "123",
       isAdmin: true,
     });
     await createUser({
-      username: "Bnice",
       firstName: "Bernice",
       lastName: "Burgos",
+      username: "Bnice",
       email: "bernice@admin.com",
-      password: await bcrypt.hash("123", salt),
+      password: "123",
+      confirmPassword: "123",
       isAdmin: true,
     });
     await createUser({
-      username: "Tfree",
       firstName: "Tyrice",
       lastName: "Freeman",
+      username: "Tfree",
       email: "tyrice@admin.com",
-      password: await bcrypt.hash("123", salt),
+      password: "123",
+      confirmPassword: "123",
       isAdmin: true,
     });
     await createUser({
-      username: "jsam",
       firstName: "Jose",
       lastName: "SamboniGaviria",
+      username: "jsamm",
       email: "jose@admin.com",
-      password: await bcrypt.hash("123", salt),
+      password: "123",
+      confirmPassword: "123",
       isAdmin: true,
     });
-    console.log("Finished creating users!");
+    console.log("Users created successful!");
   } catch (error) {
     console.error("Error creating users!");
     throw error;
   }
 }
 
-async function createUser({ firstName, username, lastName, email, password, isAdmin }) {
+async function createUser({
+  firstName,
+  lastName,
+  username,
+  email,
+  password,
+  confirmPassword,
+  isAdmin,
+}) {
+  // Check if passwords match
+  if (password !== confirmPassword) {
+    throw new Error("Passwords do not match");
+  }
   try {
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password, salt);
     await prisma.user.create({
       data: {
-        username,
         firstname: firstName,
         lastname: lastName,
+        username,
         email,
-        password,
+        password: hashPassword,
+        confirmPassword: hashPassword,
         isadmin: isAdmin,
       },
     });
